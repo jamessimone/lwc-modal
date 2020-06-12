@@ -1,0 +1,60 @@
+<template>
+    <section aria-hidden={isOpen}>
+        <slot name="body"></slot>
+    </section>
+    <section
+        aria-describedby="modal-content-id-1"
+        aria-hidden={modalAriaHidden}
+        aria-labelledby="modal-heading-01"
+        aria-modal="true"
+        class={cssClass}
+        role="dialog"
+        onclick={toggleModal}
+    >
+        <div class="slds-modal__container" onclick={handleInnerModalClick}>
+            <div class="innerModal">
+                <template if:true={modalHeader}>
+                    <header class="slds-modal__header">
+                        <h2
+                            id="modal-heading-01"
+                            class="slds-modal__title slds-hyphenate"
+                        >
+                            {modalHeader}
+                        </h2>
+                        <template if:true={modalTagline}>
+                            <p class="slds-m-top_x-small">
+                                {modalTagline}
+                            </p>
+                        </template>
+                    </header>
+                </template>
+                <div
+                    class="slds-modal__content slds-p-around_medium"
+                    id="modal-content-id-1"
+                >
+                    <slot name="modalContent"></slot>
+                </div>
+                <footer class="slds-modal__footer">
+                    <button
+                        class="slds-button slds-button_neutral focusable"
+                        onclick={closeModal}
+                    >
+                        Cancel
+                    </button>
+                    <template if:true={modalSaveHandler}>
+                        <button
+                            class="slds-button slds-button_brand focusable"
+                            onclick={modalSaveHandler}
+                        >
+                            Save
+                        </button>
+                    </template>
+                </footer>
+            </div>
+        </div>
+    </section>
+    <template if:true={isOpen}>
+        <!-- when the modal is open, this element "grays out" the rest of the screen -->
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

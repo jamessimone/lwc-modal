@@ -1,0 +1,11 @@
+{
+    "name": "lwc-modal",
+    "version": "0.0.1",
+    "description": "Lightning Web Components Modal recipe",
+    "author": "James Simone <james@sheandjim.com>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jamessimone/lwc-modal"
+    }
+}
