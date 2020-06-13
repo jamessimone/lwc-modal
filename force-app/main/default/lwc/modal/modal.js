@@ -3,42 +3,34 @@ import { api, LightningElement } from 'lwc';
 const ESC_KEY_CODE = 27;
 const ESC_KEY_STRING = 'Escape';
 const FOCUSABLE_ELEMENTS = '.focusable';
-const INNER_MODAL_CLASS = '.innerModal';
+const OUTER_MODAL_CLASS = 'outerModalContent';
 const TAB_KEY_CODE = 9;
 const TAB_KEY_STRING = 'Tab';
 
 export default class Modal extends LightningElement {
     isFirstRender = true;
     isOpen = false;
-    modalDimensions = {
-        top: 0,
-        left: 0,
-        bottom: 0,
-        right: 0
-    };
-    eventListeners = [
-        { name: 'resize', listener: () => this._setModalSize() },
-        { name: 'keyup', listener: (e) => this.handleKeyUp(e) }
-    ];
+
+    constructor() {
+        super();
+        this.template.addEventListener('click', (event) => {
+            const classList = [...event.target.classList];
+            if (classList.includes(OUTER_MODAL_CLASS)) {
+                this.toggleModal();
+            }
+        });
+    }
 
     renderedCallback() {
-        //always best to short-circuit when adding event listeners
         if (this.isFirstRender) {
             this.isFirstRender = false;
-            this._setModalSize();
-            for (let eventListener of this.eventListeners) {
-                window.addEventListener(
-                    eventListener.name,
-                    eventListener.listener
-                );
-            }
+
+            window.addEventListener('keyup', (e) => this.handleKeyUp(e));
         }
     }
 
     disconnectedCallback() {
-        for (let eventListener of this.eventListeners) {
-            window.removeEventListener(eventListener.name);
-        }
+        window.removeEventListener('keyup');
     }
 
     @api modalHeader;
@@ -47,6 +39,7 @@ export default class Modal extends LightningElement {
 
     @api
     toggleModal() {
+        debugger;
         this.isOpen = !this.isOpen;
         if (this.isOpen) {
             const focusableElems = this._getFocusableElements();
@@ -56,7 +49,7 @@ export default class Modal extends LightningElement {
 
     @api
     get cssClass() {
-        const baseClass = 'slds-modal ';
+        const baseClass = 'slds-modal outerModalContent ';
         return (
             baseClass +
             (this.isOpen ? 'slds-visible slds-fade-in-open' : 'slds-hidden')
@@ -76,25 +69,6 @@ export default class Modal extends LightningElement {
     handleModalLostFocus() {
         const focusableElems = this._getFocusableElements();
         this._focusFirstTabbableElement(focusableElems);
-    }
-
-    handleInnerModalClick(event) {
-        //stop the event from bubbling to the <section>
-        //otherwise any click, anywhere in the modal,
-        //will close it
-        event.stopPropagation();
-
-        const isWithinInnerXBoundary =
-            event.clientX >= this.modalDimensions.left &&
-            event.clientX <= this.modalDimensions.right;
-        const isWithinInnerYBoundary =
-            event.clientY >= this.modalDimensions.top &&
-            event.clientY <= this.modalDimensions.bottom;
-        if (isWithinInnerXBoundary && isWithinInnerYBoundary) {
-            //do nothing, the click was properly within the modal bounds
-            return;
-        }
-        this.toggleModal();
     }
 
     handleKeyUp(event) {
@@ -135,6 +109,7 @@ export default class Modal extends LightningElement {
         const potentialElems = [
             ...this.template.querySelectorAll(FOCUSABLE_ELEMENTS)
         ];
+
         return potentialElems;
     }
 
@@ -142,15 +117,5 @@ export default class Modal extends LightningElement {
         if (focusableElems.length > 0) {
             focusableElems[0].focus();
         }
-    }
-
-    _setModalSize() {
-        const innerModalDimensions = this.template
-            .querySelector(INNER_MODAL_CLASS)
-            .getBoundingClientRect();
-        this.modalDimensions.top = innerModalDimensions.top;
-        this.modalDimensions.left = innerModalDimensions.left;
-        this.modalDimensions.bottom = innerModalDimensions.bottom;
-        this.modalDimensions.right = innerModalDimensions.right;
     }
 }

@@ -9,15 +9,9 @@
         aria-modal="true"
         class={cssClass}
         role="dialog"
-        onclick={toggleModal}
     >
-        <div class="slds-modal__container" onclick={handleInnerModalClick}>
-            <div
-                class="innerModal"
-                onclick={toggleModal}
-                tabindex="0"
-                onfocus={handleModalLostFocus}
-            >
+        <div class="slds-modal__container outerModalContent">
+            <div class="innerModal" tabindex="0" onfocus={handleModalLostFocus}>
                 <template if:true={modalHeader}>
                     <header class="slds-modal__header">
                         <h2
@@ -59,7 +53,6 @@
         </div>
     </section>
     <template if:true={isOpen}>
-        <!-- when the modal is open, this element "grays out" the rest of the screen -->
         <div class="slds-backdrop slds-backdrop_open"></div>
     </template>
 </template>
