@@ -8,6 +8,7 @@ const TAB_KEY_CODE = 9;
 const TAB_KEY_STRING = 'Tab';
 
 export default class Modal extends LightningElement {
+    isFirstRender = true;
     isOpen = false;
     modalDimensions = {
         top: 0,
@@ -21,9 +22,16 @@ export default class Modal extends LightningElement {
     ];
 
     renderedCallback() {
-        this._setModalSize();
-        for (let eventListener of this.eventListeners) {
-            window.addEventListener(eventListener.name, eventListener.listener);
+        //always best to short-circuit when adding event listeners
+        if (this.isFirstRender) {
+            this.isFirstRender = false;
+            this._setModalSize();
+            for (let eventListener of this.eventListeners) {
+                window.addEventListener(
+                    eventListener.name,
+                    eventListener.listener
+                );
+            }
         }
     }
 
@@ -63,6 +71,11 @@ export default class Modal extends LightningElement {
     closeModal(event) {
         event.stopPropagation();
         this.toggleModal();
+    }
+
+    handleModalLostFocus() {
+        const focusableElems = this._getFocusableElements();
+        this._focusFirstTabbableElement(focusableElems);
     }
 
     handleInnerModalClick(event) {

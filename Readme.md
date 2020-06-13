@@ -38,3 +38,7 @@ Additionally, this modal meets all of the criteria for the [LDS's expected keybo
 ## Closing
 
 In practice, the use of a modal is either to display optional information (in which case the `modalSaveHandler` function is unnecessary; you only need to give people options for how to close the modal), or to block progress until a form/required fields are filled out. Either way, this modal recipe gives you everything you need to succeed!
+
+## Thanks To
+
+Many thanks to SFXD member and reader **havana59er** for suggesting the `renderedCallback` short-circuit (always a good practice to prevent unnecessary event listeners being added), as well as for experimenting with how to prevent tabbing/shift-tabbing out of the modal. His contribution has made the modal a better component!

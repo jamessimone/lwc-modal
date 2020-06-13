@@ -12,7 +12,12 @@
         onclick={toggleModal}
     >
         <div class="slds-modal__container" onclick={handleInnerModalClick}>
-            <div class="innerModal">
+            <div
+                class="innerModal"
+                onclick={toggleModal}
+                tabindex="0"
+                onfocus={handleModalLostFocus}
+            >
                 <template if:true={modalHeader}>
                     <header class="slds-modal__header">
                         <h2
