@@ -39,6 +39,7 @@ Additionally, this modal meets all of the criteria for the [LDS's expected keybo
 
 In practice, the use of a modal is either to display optional information (in which case the `modalSaveHandler` function is unnecessary; you only need to give people options for how to close the modal), or to block progress until a form/required fields are filled out. Either way, this modal recipe gives you everything you need to succeed!
 
-## Thanks To
+## Contributions
 
-Many thanks to SFXD member and reader **havana59er** for suggesting the `renderedCallback` short-circuit (always a good practice to prevent unnecessary event listeners being added), as well as for experimenting with how to prevent tabbing/shift-tabbing out of the modal. His contribution has made the modal a better component!
+-   many thanks to reader and [SFXD Discord](https://discord.gg/xaM5cYq) frequenter **havana59er** for his contributions to the article. His investigation into assigning the `tabindex` property to different sections of the modal, additional `handleModalLostFocus` handler, and short-circuit feedback for `renderedCallback` were all excellent. I'm much obliged, and the modal is better off!
+-   hats off to [Justin Lyon](https://github.com/jlyon87), another [SFXD Discord](https://discord.gg/xaM5cYq) frequenter and fellow LWC enthusiast for experimenting with his own modal. He managed to shave off one of the existing `window` event listeners by the use of explicit classes to determine when the modal should be closed. The post has been updated to reflect this; however, I leave the original solution below because I believe that `getBoundingClientRect()` is something you should know about when considering your options for examining the size of a contiguous DOM section!
