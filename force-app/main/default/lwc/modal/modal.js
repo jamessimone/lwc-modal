@@ -13,7 +13,7 @@ export default class Modal extends LightningElement {
 
     constructor() {
         super();
-        this.template.addEventListener('click', (event) => {
+        this.template.addEventListener('click', event => {
             const classList = [...event.target.classList];
             if (classList.includes(OUTER_MODAL_CLASS)) {
                 this.toggleModal();
@@ -25,7 +25,7 @@ export default class Modal extends LightningElement {
         if (this.isFirstRender) {
             this.isFirstRender = false;
 
-            window.addEventListener('keyup', (e) => this.handleKeyUp(e));
+            window.addEventListener('keyup', e => this.handleKeyUp(e));
         }
     }
 
@@ -39,7 +39,6 @@ export default class Modal extends LightningElement {
 
     @api
     toggleModal() {
-        debugger;
         this.isOpen = !this.isOpen;
         if (this.isOpen) {
             const focusableElems = this._getFocusableElements();
