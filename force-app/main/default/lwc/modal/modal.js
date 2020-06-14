@@ -2,33 +2,34 @@ import { api, LightningElement } from 'lwc';
 
 const ESC_KEY_CODE = 27;
 const ESC_KEY_STRING = 'Escape';
-const FOCUSABLE_ELEMENTS = '.focusable';
-const OUTER_MODAL_CLASS = 'outerModalContent';
 const TAB_KEY_CODE = 9;
 const TAB_KEY_STRING = 'Tab';
 
 export default class Modal extends LightningElement {
+    focusGained = false;
     isFirstRender = true;
     isOpen = false;
 
-    constructor() {
-        super();
-        this.template.addEventListener('click', event => {
-            const classList = [...event.target.classList];
-            if (classList.includes(OUTER_MODAL_CLASS)) {
-                this.toggleModal();
-            }
-        });
-    }
+    outsideClickListener = (e) => {
+        e.stopPropagation();
+        if (!this.isOpen) {
+            return;
+        }
+        this.toggleModal();
+    };
+
+    focusListener = () => (this.focusGained = true);
 
     renderedCallback() {
+        this.focusGained = false;
         if (this.isFirstRender) {
             this.isFirstRender = false;
-
-            window.addEventListener('keyup', e => this.handleKeyUp(e), {
-                once: true
-            });
+            document.addEventListener('click', this.outsideClickListener);
         }
+    }
+
+    disconnectedCallback() {
+        document.removeEventListener('click', this.outsideClickListener);
     }
 
     @api modalHeader;
@@ -39,18 +40,17 @@ export default class Modal extends LightningElement {
     toggleModal() {
         this.isOpen = !this.isOpen;
         if (this.isOpen) {
-            const focusableElems = this._getFocusableElements();
-            this._focusFirstTabbableElement(focusableElems);
+            this.focusFirstChild();
         }
     }
 
     @api
     get cssClass() {
-        const baseClass = 'slds-modal outerModalContent ';
-        return (
-            baseClass +
-            (this.isOpen ? 'slds-visible slds-fade-in-open' : 'slds-hidden')
-        );
+        const baseClasses = ['slds-modal'];
+        baseClasses.push([
+            this.isOpen ? 'slds-visible slds-fade-in-open' : 'slds-hidden'
+        ]);
+        return baseClasses.join(' ');
     }
 
     @api
@@ -63,56 +63,65 @@ export default class Modal extends LightningElement {
         this.toggleModal();
     }
 
-    handleModalLostFocus() {
-        const focusableElems = this._getFocusableElements();
-        this._focusFirstTabbableElement(focusableElems);
+    innerClickHandler(event) {
+        event.stopPropagation();
     }
 
-    handleKeyUp(event) {
+    innerKeyUpHandler(event) {
         if (event.keyCode === ESC_KEY_CODE || event.code === ESC_KEY_STRING) {
             this.toggleModal();
         } else if (
             event.keyCode === TAB_KEY_CODE ||
             event.code === TAB_KEY_STRING
         ) {
-            const focusableElems = this._getFocusableElements();
-            if (this._shouldRefocusToModal(focusableElems)) {
-                this._focusFirstTabbableElement(focusableElems);
+            const el = this.template.activeElement;
+            let focusableElement;
+            if (event.shiftKey && el && el.classList.contains('firstlink')) {
+                //the save button is only shown
+                //for modals with a saveHandler attached
+                //fallback to the first button, otherwise
+                focusableElement = this.template.querySelector('button.save');
+                if (!focusableElement) {
+                    focusableElement = this._getCloseButton();
+                }
+                focusableElement.focus();
+            } else if (el && el.classList.contains('lastLink')) {
+                focusableElement = this._getCloseButton();
+            }
+            if (focusableElement) {
+                focusableElement.focus();
             }
         }
     }
 
-    _shouldRefocusToModal(focusableElems) {
-        return focusableElems.indexOf(this.template.activeElement) === -1;
+    _getCloseButton() {
+        return this.template.querySelector('button[title="Close"]');
     }
 
-    _getFocusableElements() {
-        /*a not obvious distinct between slotted components
-        and the rest of the component's markup:
-        markup injected by slot appears with this.querySelector
-        or this.querySelectorAll; all other markup for a component
-        appears with this.template.querySelector/querySelectorAll.
-        unfortunately, at the present moment I cannot use the focusable
-        elements returned by this.querySelectorAll, because this.template.activeElement
-        is not set when markup injected via slot is focused. I have filed
-        an issue on the LWC github (https://github.com/salesforce/lwc/issues/1923)
-        and will fix the below lines once the issue has been resolved
-
-        const potentialElems = [...this.querySelectorAll(FOCUSABLE_ELEMENTS)];
-        potentialElems.push(
-            ...this.template.querySelectorAll(FOCUSABLE_ELEMENTS)
-        ); */
-
-        const potentialElems = [
-            ...this.template.querySelectorAll(FOCUSABLE_ELEMENTS)
-        ];
-
-        return potentialElems;
-    }
-
-    _focusFirstTabbableElement(focusableElems) {
-        if (focusableElems.length > 0) {
-            focusableElems[0].focus();
+    async focusFirstChild() {
+        const children = [...this.querySelectorAll('*')];
+        for (let child of children) {
+            if (this.focusGained) {
+                break;
+            }
+            await this.setFocus(child);
         }
+        if (!this.focusGained) {
+            //if there is no focusable markup from slots
+            //focus the first button
+            const closeButton = this._getCloseButton();
+            if (closeButton) {
+                closeButton.focus();
+            }
+        }
+    }
+
+    setFocus(el) {
+        return new Promise((resolve) => {
+            el.addEventListener('focus', this.focusListener);
+            el.focus();
+            el.removeEventListener('focus', this.focusListener);
+            setTimeout(resolve, 10);
+        });
     }
 }

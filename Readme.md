@@ -10,7 +10,7 @@ Included in this repository is the `modal` as well as an example `modal_wrapper`
 -   (property - `string?`) `modal-tagline` : use to display a subtitle for your modal
 -   (property - `function?`) `modalSaveHandler` can be passed to the modal to display a save button. Injecting this function into the modal _requires_ the use of a fat-arrow function, as demonstrated in the `modal_wrapper` example
 -   (slot - name = "body") this slot is to be used for any and all LWC content that is to be "hidden" and marked inaccessible when the modal is open
--   (slot - name = "modalContent") this slot is used to inject markup into the body of the modal. In the `modal_wrapper` example, I use a date-type `lightning-input`, as well as some text, to demonstrate
+-   (slot - name = "modalContent") this slot is used to inject markup into the body of the modal. In the `modal_wrapper` example below, you can see two standard text-based `lightning-input` components, as well as a date-type `lightning-input` being passed to the modal
 -   (public method) `toggleModal` - the `modal_wrapper` example makes use of a button whose `onclick` method calls the modal to open it
 
 ## What Does It End Up Looking Like?
@@ -25,7 +25,7 @@ As much as possible, this modal attempts to adhere to the guidelines set down fo
 
 > Modals, by definition, trap focus. This means that if a user presses Tab or Shift+Tab while their keyboard focus is in the modal, their focus should stay in and cycle through the modal’s content. Focus shouldn’t return to the underlying page until the user presses the Esc key, presses an explicit “Cancel” or “Close” button in the modal, or performs another action that closes the modal.
 
-One active issue with trapping focus in the modal at present is with the injected elements; in theory, you should be able to use append the `focusable` class to all focusable elements that are part of the `modalContent` slot; however, in practice, the LWC shadow DOM (and Web Components in general) do not support the detection of focused elements that are injected by slot. I have [filed a Github issue with the LWC team](https://github.com/salesforce/lwc/issues/1923) in the hopes of resolving this. For now, this means that only the cancel/save buttons have "trapped" focus within the modal. Focus is still trapped; it's just limited to those buttons for now.
+Credit for properly trapping focus within the modal goes to [Suraj Pillai](https://github.com/surajp). The "issue" with LWC / Web Components in general at the moment is that the Shadow DOM is supposed to prevent a component from knowing anything about the DOM except what's present in the component - but slot-based composition, the ideal way to compose a modal that can be used by any component, isn't presently a first-class citizen for detecting focusable elements that have been injected by means of `<slot>` markup. I have [filed a Github issue with the LWC team](https://github.com/salesforce/lwc/issues/1923) trying to address this, but in the meantime, focus-trapping can still be achieved.
 
 Additionally, this modal meets all of the criteria for the [LDS's expected keyboard interactions](https://www.lightningdesignsystem.com/components/modals/#Expected-keyboard-interactions):
 
@@ -43,3 +43,4 @@ In practice, the use of a modal is either to display optional information (in wh
 
 -   many thanks to reader and [SFXD Discord](https://discord.gg/xaM5cYq) frequenter **havana59er** for his contributions to the article. His investigation into assigning the `tabindex` property to different sections of the modal, additional `handleModalLostFocus` handler, and short-circuit feedback for `renderedCallback` were all excellent. I'm much obliged, and the modal is better off!
 -   hats off to [Justin Lyon](https://github.com/jlyon87), another [SFXD Discord](https://discord.gg/xaM5cYq) frequenter and fellow LWC enthusiast for experimenting with his own modal. He managed to shave off one of the existing `window` event listeners by the use of explicit classes to determine when the modal should be closed. The post has been updated to reflect this; however, I leave the original solution below because I believe that `getBoundingClientRect()` is something you should know about when considering your options for examining the size of a contiguous DOM section!
+-   the code has been cleaned up considerably by [SFXD Discord](https://discord.gg/xaM5cYq) legend, [Pseudobinary](https://github.com/surajp), aka'd as PSB. His focus-trapping solution is a huge success!

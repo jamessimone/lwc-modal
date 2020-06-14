@@ -69,24 +69,15 @@ describe('modal tests', () => {
 
         return assertForTestConditions(() => {
             expect(modal.modalAriaHidden).toBeFalsy();
-            const modalSection = modal.shadowRoot.querySelector(
-                `section[role="dialog"]`
-            );
-            expect([...modalSection.classList].join(' ')).toEqual(
-                'slds-modal outerModalContent slds-visible slds-fade-in-open'
+
+            expect(modal.cssClass).toEqual(
+                'slds-modal slds-visible slds-fade-in-open'
             );
 
             const backdropAfterOpen = modal.shadowRoot.querySelector(
                 '.slds-backdrop_open'
             );
             expect(backdropAfterOpen).toBeTruthy();
-
-            //it should auto-focus the cancel button when opened
-            const cancelButton = modal.shadowRoot.querySelector(
-                'button[class="slds-button slds-button_neutral focusable"]'
-            );
-            expect(cancelButton).toBeTruthy();
-            expect(modal.shadowRoot.activeElement).toEqual(cancelButton);
         });
     });
 
@@ -98,16 +89,12 @@ describe('modal tests', () => {
 
         modal.toggleModal();
 
-        const anyOuterElement = modal.shadowRoot.querySelector(
-            '.outerModalContent'
-        );
-        anyOuterElement.click();
-
         return assertForTestConditions(() => {
-            expect(anyOuterElement).toBeTruthy();
-            expect(modal.cssClass).toEqual(
-                'slds-modal outerModalContent slds-hidden'
+            const anyOuterElement = modal.shadowRoot.querySelector(
+                '.slds-modal'
             );
+            anyOuterElement.click();
+            expect(modal.cssClass).toEqual('slds-modal slds-hidden');
             expect(modal.modalAriaHidden).toBeTruthy();
         });
     });
@@ -120,10 +107,11 @@ describe('modal tests', () => {
 
         modal.toggleModal();
 
-        var event = new KeyboardEvent('keyup', { code: 'Escape' });
-        window.dispatchEvent(event);
-
         return assertForTestConditions(() => {
+            const event = new KeyboardEvent('keyup', { code: 'Escape' });
+            modal.shadowRoot
+                .querySelector('section[role="dialog"]')
+                .dispatchEvent(event);
             expect(modal.modalAriaHidden).toBeTruthy();
         });
     });
@@ -138,20 +126,35 @@ describe('modal tests', () => {
         const modalSaveHandler = () => (wasCalled = true);
         modal.modalSaveHandler = modalSaveHandler;
 
-        const saveButtonBefore = modal.shadowRoot.querySelector(
-            `button[class="slds-button slds-button_brand focusable"]`
-        );
+        const saveSelector = `button[class="slds-button slds-button_brand save"]`;
+
+        const saveButtonBefore = modal.shadowRoot.querySelector(saveSelector);
 
         return assertForTestConditions(() => {
             expect(wasCalled).toBeFalsy();
             expect(saveButtonBefore).toBeNull();
 
             const saveButtonAfter = modal.shadowRoot.querySelector(
-                `button[class="slds-button slds-button_brand focusable"]`
+                saveSelector
             );
             expect(saveButtonAfter).toBeTruthy();
             saveButtonAfter.click();
             expect(wasCalled).toBeTruthy();
+        });
+    });
+
+    it('should focus the close button when no focusable markup is passed', () => {
+        const modal = createElement('c-modal', {
+            is: Modal
+        });
+        document.body.appendChild(modal);
+
+        modal.toggleModal();
+
+        return assertForTestConditions(() => {
+            expect(
+                modal.shadowRoot.querySelector('button[title="Close"]')
+            ).toEqual(modal.shadowRoot.activeElement);
         });
     });
 });
