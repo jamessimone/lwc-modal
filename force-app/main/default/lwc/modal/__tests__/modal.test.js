@@ -23,6 +23,9 @@ describe('modal tests', () => {
         });
         document.body.appendChild(modal);
 
+        //initial DOM updates caused by the first render
+        //including the negative case of something not being shown
+        //can be immediately asserted for
         const headerElementBeforeHeaderSet = modal.shadowRoot.querySelector(
             '.slds-modal__header'
         );
@@ -143,7 +146,27 @@ describe('modal tests', () => {
         });
     });
 
-    it('should focus the close button when no focusable markup is passed', () => {
+    it('should focus the close button when no focusable markup is passed and header is present', () => {
+        const modal = createElement('c-modal', {
+            is: Modal
+        });
+        modal.modalHeader = 'Some Value';
+        document.body.appendChild(modal);
+
+        modal.toggleModal();
+
+        return assertForTestConditions(() => {
+            const firstCloseButton = modal.shadowRoot.querySelector(
+                'button[title="Close"]'
+            );
+            expect(firstCloseButton).toBeTruthy();
+            expect(modal.shadowRoot.activeElement).toBeTruthy();
+
+            expect(firstCloseButton).toEqual(modal.shadowRoot.activeElement);
+        });
+    });
+
+    it('should focus the cancel button when no focusable markup is passed and no header is present', () => {
         const modal = createElement('c-modal', {
             is: Modal
         });
@@ -152,9 +175,12 @@ describe('modal tests', () => {
         modal.toggleModal();
 
         return assertForTestConditions(() => {
-            expect(
-                modal.shadowRoot.querySelector('button[title="Close"]')
-            ).toEqual(modal.shadowRoot.activeElement);
+            const firstCloseButton = modal.shadowRoot.querySelector('button');
+            expect(firstCloseButton).toBeTruthy();
+            expect(firstCloseButton.textContent).toEqual('Cancel');
+            expect(modal.shadowRoot.activeElement).toBeTruthy();
+
+            expect(firstCloseButton).toEqual(modal.shadowRoot.activeElement);
         });
     });
 });

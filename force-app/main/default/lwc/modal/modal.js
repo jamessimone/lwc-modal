@@ -122,6 +122,10 @@ export default class Modal extends LightningElement {
         const closeButton = this._getCloseButton();
         if (closeButton) {
             closeButton.focus();
+        } else {
+            //if no header is present, the first button is
+            //always the cancel button
+            this.template.querySelector('button').focus();
         }
     }
 
