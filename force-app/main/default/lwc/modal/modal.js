@@ -76,12 +76,10 @@ export default class Modal extends LightningElement {
             if (event.shiftKey && el && el.classList.contains('firstlink')) {
                 //the save button is only shown
                 //for modals with a saveHandler attached
-                //fallback to the first button, otherwise
-                focusableElement = this.template.querySelector('button.save');
-                if (!focusableElement) {
-                    focusableElement = this._getCloseButton();
-                }
-                focusableElement.focus();
+                //fallback to the close button, otherwise
+                focusableElement = this.modalSaveHandler
+                    ? this.template.querySelector('button.save')
+                    : this._getCloseButton();
             } else if (el && el.classList.contains('lastLink')) {
                 focusableElement = this._getCloseButton();
             }
@@ -92,7 +90,13 @@ export default class Modal extends LightningElement {
     }
 
     _getCloseButton() {
-        return this.template.querySelector('button[title="Close"]');
+        let closeButton = this.template.querySelector('button[title="Close"]');
+        if (!closeButton) {
+            //if no header is present, the first button is
+            //always the cancel button
+            closeButton = this.template.querySelector('button');
+        }
+        return closeButton;
     }
 
     _getSlotName(element) {
