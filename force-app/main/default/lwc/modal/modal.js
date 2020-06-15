@@ -6,7 +6,6 @@ const TAB_KEY_CODE = 9;
 const TAB_KEY_STRING = 'Tab';
 
 export default class Modal extends LightningElement {
-    focusGained = false;
     isFirstRender = true;
     isOpen = false;
 
@@ -17,8 +16,6 @@ export default class Modal extends LightningElement {
         }
         this.toggleModal();
     };
-
-    focusListener = () => (this.focusGained = true);
 
     renderedCallback() {
         this.focusGained = false;
@@ -98,30 +95,45 @@ export default class Modal extends LightningElement {
         return this.template.querySelector('button[title="Close"]');
     }
 
+    _getSlotName(element) {
+        let slotName = element.slot;
+        while (!slotName && element.parentElement) {
+            slotName = this._getSlotName(element.parentElement);
+        }
+        return slotName;
+    }
+
     async focusFirstChild() {
         const children = [...this.querySelectorAll('*')];
         for (let child of children) {
-            if (this.focusGained) {
-                break;
+            let hasBeenFocused = false;
+            if (this._getSlotName(child) === 'body') {
+                continue;
             }
-            await this.setFocus(child);
+            await this.setFocus(child).then((res) => {
+                hasBeenFocused = res;
+            });
+            if (hasBeenFocused) {
+                return;
+            }
         }
-        if (!this.focusGained) {
-            //if there is no focusable markup from slots
-            //focus the first button
-            const closeButton = this._getCloseButton();
-            if (closeButton) {
-                closeButton.focus();
-            }
+        //if there is no focusable markup from slots
+        //focus the first button
+        const closeButton = this._getCloseButton();
+        if (closeButton) {
+            closeButton.focus();
         }
     }
 
     setFocus(el) {
         return new Promise((resolve) => {
-            el.addEventListener('focus', this.focusListener);
-            el.focus();
-            el.removeEventListener('focus', this.focusListener);
-            setTimeout(resolve, 10);
+            try {
+                el.addEventListener('focus', () => resolve(true));
+                el.focus();
+                setTimeout(() => resolve(false), 0);
+            } catch (ex) {
+                resolve(false);
+            }
         });
     }
 }
