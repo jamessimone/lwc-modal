@@ -126,18 +126,16 @@ export default class Modal extends LightningElement {
         const closeButton = this._getCloseButton();
         if (closeButton) {
             closeButton.focus();
-        } else {
-            //if no header is present, the first button is
-            //always the cancel button
-            this.template.querySelector('button').focus();
         }
     }
 
     setFocus(el) {
         return new Promise((resolve) => {
+            const promiseListener = () => resolve(true);
             try {
-                el.addEventListener('focus', () => resolve(true));
+                el.addEventListener('focus', promiseListener);
                 el.focus();
+                el.removeEventListener('focus', promiseListener);
                 setTimeout(() => resolve(false), 0);
             } catch (ex) {
                 resolve(false);
