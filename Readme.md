@@ -1,6 +1,6 @@
 # Lightning Web Component Modal
 
-An example of how to implement a composable modal LWC, which can be used in any project.
+An example of how to implement a composable modal LWC, which can be used in any project. To read the whole blog post about putting this together, please refer to [The Joys of Apex: Composable Modal post](https://www.jamessimone.net/blog/joys-of-apex/lwc-composable-modal/). The [next post](https://www.jamessimone.net/blog/joys-of-apex/lwc-modal-cleanup-and-testing/) also ties together several points related to `<slot>` based composition in LWC, as well as how to write good unit tests for your Lightning Web Components.
 
 ## Modal Usage
 
