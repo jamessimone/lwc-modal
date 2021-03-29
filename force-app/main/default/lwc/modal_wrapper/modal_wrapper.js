@@ -1,7 +1,9 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class ModalWrapper extends LightningElement {
+    @api recordId;
+
     handleClick(event) {
         event.preventDefault();
         event.stopPropagation();
@@ -14,7 +16,7 @@ export default class ModalWrapper extends LightningElement {
         //normally here you would do things like
         //validate your inputs were correctly filled out
         event.stopPropagation();
-        this.handleClick();
+        this.handleClick(event);
         this.dispatchEvent(
             new ShowToastEvent({
                 title: 'Success',

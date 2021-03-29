@@ -4,6 +4,7 @@ const ESC_KEY_CODE = 27;
 const ESC_KEY_STRING = 'Escape';
 const TAB_KEY_CODE = 9;
 const TAB_KEY_STRING = 'Tab';
+const LIGHTNING_INPUT_FIELD = 'LIGHTNING-INPUT-FIELD';
 
 export default class Modal extends LightningElement {
     isFirstRender = true;
@@ -44,9 +45,7 @@ export default class Modal extends LightningElement {
     @api
     get cssClass() {
         const baseClasses = ['slds-modal'];
-        baseClasses.push([
-            this.isOpen ? 'slds-visible slds-fade-in-open' : 'slds-hidden'
-        ]);
+        baseClasses.push([this.isOpen ? 'slds-visible slds-fade-in-open' : 'slds-hidden']);
         return baseClasses.join(' ');
     }
 
@@ -67,16 +66,13 @@ export default class Modal extends LightningElement {
     innerKeyUpHandler(event) {
         if (event.keyCode === ESC_KEY_CODE || event.code === ESC_KEY_STRING) {
             this.toggleModal();
-        } else if (
-            event.keyCode === TAB_KEY_CODE ||
-            event.code === TAB_KEY_STRING
-        ) {
+        } else if (event.keyCode === TAB_KEY_CODE || event.code === TAB_KEY_STRING) {
             const el = this.template.activeElement;
             let focusableElement;
             if (event.shiftKey && el && el.classList.contains('firstlink')) {
-                //the save button is only shown
-                //for modals with a saveHandler attached
-                //fallback to the close button, otherwise
+                // the save button is only shown
+                // for modals with a saveHandler attached
+                // fallback to the close button, otherwise
                 focusableElement = this.modalSaveHandler
                     ? this.template.querySelector('button.save')
                     : this._getCloseButton();
@@ -92,8 +88,8 @@ export default class Modal extends LightningElement {
     _getCloseButton() {
         let closeButton = this.template.querySelector('button[title="Close"]');
         if (!closeButton) {
-            //if no header is present, the first button is
-            //always the cancel button
+            // if no header is present, the first button is
+            // always the cancel button
             closeButton = this.template.querySelector('button');
         }
         return closeButton;
@@ -121,8 +117,8 @@ export default class Modal extends LightningElement {
                 return;
             }
         }
-        //if there is no focusable markup from slots
-        //focus the first button
+        // if there is no focusable markup from slots
+        // focus the first button
         const closeButton = this._getCloseButton();
         if (closeButton) {
             closeButton.focus();
@@ -131,14 +127,26 @@ export default class Modal extends LightningElement {
 
     setFocus(el) {
         return new Promise((resolve) => {
-            const promiseListener = () => resolve(true);
-            try {
-                el.addEventListener('focus', promiseListener);
-                el.focus();
-                el.removeEventListener('focus', promiseListener);
-                setTimeout(() => resolve(false), 0);
-            } catch (ex) {
-                resolve(false);
+            /**
+             * don't ever try to trap focus on a disabled element that can't be interacted with ...
+             * As well, there's been some regression with lightning-input-field components -
+             * they don't properly pass the "focus" event downwards through the component hierarchy, which has the fun effect of:
+             * - not triggering the promise to resolve (not what we wanted)
+             * - triggering the validation for required fields (DEFINITELY not what we wanted)
+             */
+            if (el.disabled || (el.tagName === LIGHTNING_INPUT_FIELD && el.required)) {
+                return resolve(false);
+            } else {
+                const promiseListener = () => resolve(true);
+                try {
+                    el.addEventListener('focus', promiseListener);
+                    el.focus && el.focus();
+                    el.removeEventListener('focus', promiseListener);
+
+                    setTimeout(() => resolve(false), 0);
+                } catch (ex) {
+                    return resolve(false);
+                }
             }
         });
     }
