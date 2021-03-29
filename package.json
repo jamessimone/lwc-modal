@@ -1,6 +1,6 @@
 {
     "name": "lwc-modal",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Lightning Web Components Modal recipe",
     "author": "James Simone <james@sheandjim.com>",
     "license": "MIT",
@@ -9,7 +9,7 @@
         "url": "git+https://github.com/jamessimone/lwc-modal"
     },
     "dependencies": {
-        "@salesforce/sfdx-lwc-jest": "0.7.1"
+        "@salesforce/sfdx-lwc-jest": "0.10.4"
     },
     "scripts": {
         "test": "sfdx-lwc-jest"

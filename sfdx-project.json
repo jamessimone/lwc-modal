@@ -2,12 +2,10 @@
     "packageDirectories": [
         {
             "path": "force-app",
-            "default": true,
-            "package": "lwc-modal",
-            "versionNumber": "0.0.1"
+            "default": true
         }
     ],
     "namespace": "",
-    "sourceApiVersion": "48.0",
+    "sourceApiVersion": "51.0",
     "sfdcLoginUrl": "https://login.salesforce.com"
 }
