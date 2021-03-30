@@ -1,4 +1,4 @@
-import { api, LightningElement } from 'lwc';
+import {api, LightningElement} from 'lwc';
 
 const ESC_KEY_CODE = 27;
 const ESC_KEY_STRING = 'Escape';
@@ -22,17 +22,22 @@ export default class Modal extends LightningElement {
         this.focusGained = false;
         if (this.isFirstRender) {
             this.isFirstRender = false;
-            document.addEventListener('click', this.outsideClickListener);
+            if (!this.ignoreClickEvent) {
+                document.addEventListener('click', this.outsideClickListener);
+            }
         }
     }
 
     disconnectedCallback() {
-        document.removeEventListener('click', this.outsideClickListener);
+        if (!this.ignoreClickEvent) {
+            document.removeEventListener('click', this.outsideClickListener);
+        }
     }
 
     @api modalHeader;
     @api modalTagline;
     @api modalSaveHandler;
+    @api ignoreClickEvent = false;
 
     @api
     toggleModal() {
@@ -60,7 +65,9 @@ export default class Modal extends LightningElement {
     }
 
     innerClickHandler(event) {
-        event.stopPropagation();
+        if (!this.ignoreClickEvent) {
+            event.stopPropagation();
+        }
     }
 
     innerKeyUpHandler(event) {
