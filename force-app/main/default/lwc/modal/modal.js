@@ -30,9 +30,12 @@ export default class Modal extends LightningElement {
         document.removeEventListener('click', this.outsideClickListener);
     }
 
-    @api modalHeader;
-    @api modalTagline;
-    @api modalSaveHandler;
+    @api
+    modalHeader;
+    @api
+    modalTagline;
+    @api
+    modalSaveHandler;
 
     @api
     toggleModal() {

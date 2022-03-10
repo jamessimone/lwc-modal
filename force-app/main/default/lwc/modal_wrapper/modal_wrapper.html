@@ -1,17 +1,10 @@
 <template>
-    <c-modal
-        modal-header="Modal Header"
-        modal-tagline="Some tag line"
-        modal-save-handler={modalSaveHandler}
-    >
+    <c-modal modal-header="Modal Header" modal-tagline="Some tag line" modal-save-handler={modalSaveHandler}>
         <p slot="body">This stuff can't be tabbed to when the modal is open</p>
-        <div
-            slot="modalContent"
-            class="modalContent slds-modal__content slds-p-around_medium"
-        >
+        <div slot="modalContent" class="modalContent slds-modal__content slds-var-p-around_medium">
             <p>Did you know that "Gallia est omnis divisa in partes tres" ?</p>
             <lightning-input
-                class="slds-form-element slds-m-around_small focusable"
+                class="slds-form-element slds-var-m-around_small focusable"
                 label="Some field that you have required to save a record"
                 type="date"
                 date-style="short"
@@ -20,7 +13,8 @@
             <p>Once you're done selecting the date, click "save" to proceed!</p>
         </div>
     </c-modal>
-    <button class="slds-m-left_small" onclick={handleClick}>
+    <!-- sldsValidatorIgnore -->
+    <button aria-label="A button to open the modal" class="slds-var-m-left_small" onclick={handleClick}>
         Click me to open modal
     </button>
 </template>

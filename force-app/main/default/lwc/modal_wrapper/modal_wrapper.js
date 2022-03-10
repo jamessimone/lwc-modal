@@ -2,7 +2,8 @@ import { LightningElement, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class ModalWrapper extends LightningElement {
-    @api recordId;
+    @api
+    recordId;
 
     handleClick(event) {
         event.preventDefault();
