@@ -66,6 +66,10 @@ export default class Modal extends LightningElement {
         event.stopPropagation();
     }
 
+    handleKeyPress(event) {
+        this.innerKeyUpHandler(event);
+    }
+
     innerKeyUpHandler(event) {
         if (event.keyCode === ESC_KEY_CODE || event.code === ESC_KEY_STRING) {
             this.toggleModal();
